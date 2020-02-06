@@ -12,6 +12,8 @@
  selection: .word 0
 .balign 4
  strInputFormat: .asciz "%s"
+ .balign 4
+ intInputFormat: .asciz "%d"
 .balign 4
  areaPrint: .asciz "The area is: %d \n"
 .balign 4
@@ -31,25 +33,73 @@
 .balign 4
  triangleArea: .asciz "The area of the triangle is %d\n"
  .balign 4
-invalidChoice: .asciz "Invalid choice. Type square, rectangle, triangle, or trapezoid . Or exit r\n"
+invalidPrint: .asciz "Invalid choice. Type square, rectangle, triangle, or trapezoid . Or exit r\n"
+ .balign 4
+againPrint: .asciz "Choose another. Or exit r\n"
 
-@ put in b done at end of area calls
+.balign 4 
+squareLPrompt  .asciz   “Enter square length: \n”
+.balign 4 
+rectLPrompt  .asciz   “Enter recentagle length: \n”
+.balign 4 
+rectHPrompt .asciz   “Enter recentagle height: \n”
+.balign 4 
+triLPrompt .asciz   “Enter triangle length: \n”
+.balign 4 
+triHPrompt .asciz   “Enter triangle height: \n”
+.balign 4 
+trapAPrompt .asciz   “Enter trapezoid length A: \n”
+.balign 4 
+trapBPrompt  .asciz   “Enter trapezoid length B: \n”
+.balign 4 
+trapHPrompt  .asciz   “Enter trapezoid height: \n”
+
+sqL  .word 0
+rectL  .word 0
+rectH .word 0
+triL .word 0
+triH .word 0
+trapA .word 0
+trapB  .word 0
+trapH  .word 0
+
 .global main
 main:
+b welcome_print
+@ b go_again
 
-prompt_selection:
-input_loop:
+welcome_print:
     ldr r0, =welcomePrint
-    bl  printf              
+    bl  printf
+    b get_input 
+invalid_print:
+    ldr r0, =invalidPrint
+    bl  printf
+    b get_input 
+go_again:
+    ldr r0, =againPrint
+    bl  printf
+    b get_input 
+@-----------------------------------------------------------------------------------------
+@ TODO
+@ if you have two different input prompts
+@ (welcome and go again)
+@ you need to explicitly branch to get_input from each
+@
+@-----------------------------------------------------------------------------------------
 
-    @ prompt choice
+get_input:
+    @ scanf boilerplate
     ldr r0, =strInputFormat 
     ldr r1, =selection                              
     bl  scanf 
       
-    @ load input into r2
+    @ load input into r0
     ldr r2, =selection     
-    ldr r1, [r2]  
+    ldr r0, [r2]  
+
+    @ as a parameter for
+    b branch_selection:
 
 @-----------------------------------------------------------------------------------------
 @
@@ -57,6 +107,8 @@ input_loop:
 @ (compare it to possibilities)
 @
 @-----------------------------------------------------------------------------------------
+
+branch_selection:
     @ square
     ldr r2, =square     
     ldr r3, [r2] 
@@ -69,6 +121,7 @@ input_loop:
     cmp r1, r3
     beq rectangle_sr
 
+  
     @ trapezoid
     ldr r2, =trapezoid    
     ldr r3, [r2] 
@@ -81,26 +134,83 @@ input_loop:
     cmp r1, r3
     beq triangle_sr
 
-    @ invalid choice, return user to selection prompt
-    ldr r0, =invalidChoice
-    bl  printf   
-    b input_loop
+    @ invalid choice, return user to selection prompt  
+    b invalid_print
+
+@-----------------------------------------------------------------------------------------
+@
+@ main subroutines for each shape
+@ 
+@
+@-----------------------------------------------------------------------------------------
+/*
+sub sp, sp, #4  /* sp ← sp - 8. This enlarges the stack by 8 bytes */
+str lr, [sp]    /* *sp ← lr */
+... // Code of the function
+ldr lr, [sp]    /* lr ← *sp */
+add sp, sp, #8  /* sp ← sp + 8
+*/
+square_sr:
+    sub sp, sp, #4 
+    bl square_sr_params
+    bl square_sr_area
+    bl square_sr_print
+rectangle_sr:
+    bl rectangle_sr_params
+    bl rectangle_sr_area
+    bl rectangle_sr_print
+trapezoid_sr:
+    bl trapezoid_sr_params
+    bl trapezoid_sr_area
+    bl trapezoid_sr_print
+triangle_sr:
+    bl triangle_sr_params
+    bl triangle_sr_area
+    bl triangle_sr_print
 
 evaluate_selection:
 
 @-----------------------------------------------------------------------------------------
 @
-@ calculate areas
-@
+@ get parameters
+@ registers r4-r6 store the parameters before calling calculate_area
+@ registers r7-r9 store the parameters after  calling calculate_area
 @
 @-----------------------------------------------------------------------------------------
-
+/*
+sub sp, sp, #8  /* sp ← sp - 8. This enlarges the stack by 8 bytes */
+str lr, [sp]    /* *sp ← lr */
+... // Code of the function
+ldr lr, [sp]    /* lr ← *sp */
+add sp, sp, #8  /* sp ← sp + 8
+*/
 get_params:
 square_sr_params
-    beq square_sr_area
+
+    push {lr}
+    
+    ldr r0, =squareLPrompt
+    bl  printf
+
+    ldr r0, =intInputFormat
+    ldr r1, =sqL                              
+    bl  scanf 
+    add sp, sp, #4
+    str r0, [sp]
+    sub sp, sp, #4
+
+ 
+
+    pop {pc}
 
 
 rectangle_sr_params
+    @ prompt for length, height
+    ldr r0, =invalidChoice
+    bl  printf
+    ldr r0, =invalidChoice
+    bl  printf
+
     beq rectangle_sr_area
 
 
