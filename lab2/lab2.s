@@ -13,7 +13,7 @@
 .balign 4
  strInputFormat: .asciz "%s"
 .balign 4
- areaPrint: .asciz “The area is: %d \n”
+ areaPrint: .asciz "The area is: %d \n"
 .balign 4
  rectangle: .asciz "rectangle"
 .balign 4
@@ -30,24 +30,33 @@
  trapezoidArea: .asciz "The area of the trapezoid is %d\n"
 .balign 4
  triangleArea: .asciz "The area of the triangle is %d\n"
+ .balign 4
+invalidChoice: .asciz "Invalid choice. Type square, rectangle, triangle, or trapezoid . Or exit r\n"
 
 @ put in b done at end of area calls
+.global main
 main:
 
 prompt_selection:
 input_loop:
-    ldr r0, =choicePrompt
+    ldr r0, =welcomePrint
     bl  printf              
 
     @ prompt choice
     ldr r0, =strInputFormat 
-    ldr r1, =choice                              
+    ldr r1, =selection                              
     bl  scanf 
       
     @ load input into r2
-    ldr r2, =choice     
+    ldr r2, =selection     
     ldr r1, [r2]  
 
+@-----------------------------------------------------------------------------------------
+@
+@ evaluate selection
+@ (compare it to possibilities)
+@
+@-----------------------------------------------------------------------------------------
     @ square
     ldr r2, =square     
     ldr r3, [r2] 
@@ -79,24 +88,77 @@ input_loop:
 
 evaluate_selection:
 
+@-----------------------------------------------------------------------------------------
+@
+@ calculate areas
+@
+@
+@-----------------------------------------------------------------------------------------
+
+get_params:
+square_sr_params
+    beq square_sr_area
+
+
+rectangle_sr_params
+    beq rectangle_sr_area
+
+
+trapezoid_sr_params
+    beq trapezoid_sr_area
+
+
+triangle_sr_params
+    beq triangle_sr_area
+
+
+@-----------------------------------------------------------------------------------------
+@
+@ calculate areas
+@
+@
+@-----------------------------------------------------------------------------------------
+
 calculate_area:
 
+square_sr_area:
+    beq square_sr_print
 
-square_sr    :
-    mov r0, #4
+
+rectangle_sr_area:
+    beq rectangle_sr_print
+
+
+trapezoid_sr_area:
+    beq trapezoid_sr_print
+
+
+triangle_sr_area:
+    beq triangle_sr_print
+
+
+@-----------------------------------------------------------------------------------------
+@
+@ print result
+@
+@
+@-----------------------------------------------------------------------------------------
+
+square_sr_print   :
+    mov r1, #4
     ldr r0, =squareArea
     bl  printf 
 
-rectangle_sr:
-    mov r0, #4
+rectangle_sr_print:
+    mov r1, #4
     ldr r0, =rectangleArea
     bl  printf 
-trapezoid_sr:
-    mov r0, #4
+trapezoid_sr_print:
+    mov r1, #4
     ldr r0, =trapezoidArea
     bl  printf 
-triangle_sr  :
-    mov r0, #4
+triangle_sr_print  :
+    mov r1, #4
     ldr r0, =triangleArea
     bl  printf 
 print_area:

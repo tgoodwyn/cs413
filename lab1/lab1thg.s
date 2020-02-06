@@ -41,6 +41,7 @@ digit: .asciz "%d \n"
 .balign 4
 exit_str:       .asciz      "Terminating program.\n"
 
+
 .text
 
 .global main
