@@ -1,53 +1,22 @@
-.data
-
-.balign 4
-strInputFormat: .asciz "%s"
-.balign 4
-intInputFormat: .asciz "%d"
-
-.balign 4
-rectangleArea_mini: .asciz "The area of a rectangle is %d\n"
-.balign 4
-rectangleArea_proper: .asciz "The area of a rectangle with length %d and height %d is %d\n"
-.balign 4 
-rectLPrompt:  .asciz   "Enter recentagle length: \n"
-.balign 4 
-rectHPrompt: .asciz   "Enter recentagle height: \n"
-
-.balign 4 
-exit_str:       .asciz      "Terminating program.\n"
-.balign 4
-rectL:  .word 0
-.balign 4
-rectH: .word 0
-
-.text
+/******************************************************************************
+* @file array.s
+* @brief simple array declaration and iteration example
+*
+* Simple example of declaring a fixed-width array and traversing over the
+* elements for printing.
+*
+* @author Christopher D. McMurrough
+******************************************************************************/
+ 
 .global main
+.func main
+   
 main:
 
-rectangle_sr:
-    sub sp, sp, #4
-    bl rectangle_sr_params
-    ldr r0, =rectangleArea_mini
-    bl printf
-    b _exit
+readloop:
 
-rectangle_sr_params:
+    BL  _printf             @ branch to print 
     
-    push {lr}  
-    add sp, sp, #4
-    @ ldr r0, =rectLPrompt
-    @ bl  printf
-    @ ldr r0, =intInputFormat
-    @ ldr r1, =rectL           
-    @ bl  scanf
-    mov r1, #10
-
-
-    pop {pc}
-
-
-
 _exit:  
     MOV R7, #4              @ write syscall, 4
     MOV R0, #1              @ output stream to monitor, 1
@@ -56,3 +25,16 @@ _exit:
     SWI 0                   @ execute syscall
     MOV R7, #1              @ terminate syscall, 1
     SWI 0                   @ execute syscall
+       
+_printf:
+    PUSH {LR}               @ store the return address
+    LDR R0, =printf_str     @ R0 contains formatted string address
+    BL printf               @ call printf
+    POP {PC}                @ restore the stack pointer and return
+   
+.data
+
+.balign 4
+a:              .skip       400
+printf_str:     .asciz      "a = \n"
+exit_str:       .ascii      "Terminating program.\n"

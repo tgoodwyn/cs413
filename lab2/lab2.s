@@ -53,14 +53,23 @@ trapAPrompt: .asciz   "Enter trapezoid length A: \n"
 trapBPrompt:  .asciz   "Enter trapezoid length B: \n"
 .balign 4 
 trapHPrompt:  .asciz   "Enter trapezoid height: \n"
+.balign 4
 exit_str:       .asciz      "Terminating program.\n"
+.balign 4
 sqL:  .word 0
+.balign 4
 rectL:  .word 0
+.balign 4
 rectH: .word 0
+.balign 4
 triL: .word 0
+.balign 4
 triH: .word 0
+.balign 4
 trapA: .word 0
+.balign 4
 trapB:  .word 0
+.balign 4
 trapH:  .word 0
 
 .global main
@@ -168,27 +177,31 @@ square_sr:
     bl printf
     b _exit
 rectangle_sr:
-    @ allot stack space for params
-    sub sp, sp, #8 
+
     @ branch to get_params subroutine
     bl rectangle_sr_params
     @ load params into register 4 - 6
-    ldr r4, [sp]
-    @ allot stack space for return value of area call
-    sub sp, sp, #4 
+    ldr r5, [sp], #4 @ height into r5
+    ldr r4, [sp] @ length into r4
+
     @ put parameters into parameter registers
+    mov r0, r4 @ length into r0
+    mov r1, r5 @ height into r1
+
     @ branch to get_area
     bl rectangle_sr_area
+
     @ get return from stack
     ldr r4, [sp]
     @ put saved parameters into read positions for print
-    mov r1, r7
-    mov r2, r8
-    @ put return value from area calc in last position
+    mov r1, r7 @ length into r1
+    mov r2, r8 @ height into r2
+    @ put return  in last position
     mov r3, r4
     ldr r0, =rectangleArea
     bl printf
     b _exit
+
 trapezoid_sr:
     @ allot stack space for params
     @ branch to get_params subroutine
@@ -246,9 +259,10 @@ square_sr_params:
 
 rectangle_sr_params:
     
+rectangle_sr_params:
+    
     push {lr}  
-    @ return sp to fp
-    add sp, sp, #8
+
     @@@ prompt for param 1  
     ldr r0, =rectLPrompt
     bl  printf
@@ -256,24 +270,27 @@ rectangle_sr_params:
     ldr r1, =rectL           
     bl  scanf
     ldr r0, =rectL
-    @ store param 1 in r1     
-    ldr r1, [r0] 
-    @ store this in fp -4
-    str r0, [sp], #-4
+    @ store param 1 in r4    
+    ldr r4, [r0]
+
     @@@ prompt for param 2 
     ldr r0, =rectHPrompt
     bl  printf
     ldr r0, =intInputFormat
     ldr r1, =rectH           
     bl  scanf
-    ldr r1, =rectH
-    @ store param 2 in r2     
-    ldr r2, [r0]
+    ldr r0, =rectH
+    @ store param 2 in r5    
+    ldr r5, [r0]
+
+    @ return sp to fp
+    add sp, sp, #8
+    @ store param 1 in fp -4
+    str r4, [sp], #-4
     @ store this in fp -8
-    str r0, [sp], #-4
+    str r5, [sp], #-4
+
     pop {pc}
-
-
 
 trapezoid_sr_params:
     beq trapezoid_sr_area
@@ -304,12 +321,14 @@ square_sr_area:
 
 
 rectangle_sr_area:
-    push {r4, r5, lr}
+    @      length \- height \- lr -\ (tos)
+    push { r4,       r5,       lr }
     mul r2, r0, r1
     add sp, sp, #12
     str r2, [sp]
     sub sp, sp, #12
-    pop {r7, r8, pc}
+    @ (tos) /- length /- height /- lr
+    pop      { r7,       r8,       pc }
 
 
 

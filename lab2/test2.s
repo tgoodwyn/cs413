@@ -26,12 +26,12 @@ main:
 
 rectangle_sr:
     @ allot stack space for params
-     sub sp, sp, #8 
+     @sub sp, sp, #8 - this line optional
     @ branch to get_params subroutine
     bl rectangle_sr_params
     @ load params into register 4 - 6
-    ldr r5, [sp], #4
-    ldr r4, [sp], #4
+    ldr r5, [sp], #4 @ height into r5
+    ldr r4, [sp] @ length into r4
     @ allot stack space for return value of area call
     @sub sp, sp, #4 
     @ put parameters into parameter registers
@@ -44,8 +44,8 @@ rectangle_sr:
     @  mov r5, #5
     @ mov r4, #20
 
-    mov r1, r4
-    mov r2, r5
+    mov r1, r4 @ length into r1
+    mov r2, r5 @ height into r2
     @ put return value from area calc in last position
     mov r3, #30
     ldr r0, =rectangleArea
@@ -54,35 +54,38 @@ rectangle_sr:
 
 rectangle_sr_params:
     
-     push {lr}  
-@     @ return sp to fp
-    add sp, sp, #8
-@     @@@ prompt for param 1  
-    @ ldr r0, =rectLPrompt
-    @ bl  printf
+    push {lr}  
+
+    @@@ prompt for param 1  
+    ldr r0, =rectLPrompt
+    bl  printf
     ldr r0, =intInputFormat
     ldr r1, =rectL           
     bl  scanf
-    @ ldr r0, =rectL
-@     @ store param 1 in r1     
-    @ ldr r1, [r0] 
-@     @ store this in fp -4
-    mov r1, #10
-    str r1, [sp], #-4
+    ldr r0, =rectL
+    @ store param 1 in r4    
+    ldr r4, [r0]
 
-@     @@@ prompt for param 2 
-@     ldr r0, =rectHPrompt
-@     bl  printf
-@     ldr r0, =intInputFormat
-@     ldr r1, =rectH           
-@     bl  scanf
-@     ldr r1, =rectH
-@     @ store param 2 in r2     
-@     ldr r2, [r0]
-@     @ store this in fp -8
-    mov r2, #3
-    str r2, [sp], #-4
-     pop {pc}
+
+
+    @@@ prompt for param 2 
+    ldr r0, =rectHPrompt
+    bl  printf
+    ldr r0, =intInputFormat
+    ldr r1, =rectH           
+    bl  scanf
+    ldr r0, =rectH
+    @ store param 2 in r5    
+    ldr r5, [r0]
+
+    @ return sp to fp
+    add sp, sp, #8
+    @ store param 1 in fp -4
+    str r4, [sp], #-4
+    @ store this in fp -8
+    str r5, [sp], #-4
+
+    pop {pc}
 
 
 _exit:  

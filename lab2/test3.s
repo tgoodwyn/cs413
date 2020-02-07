@@ -9,9 +9,9 @@ intInputFormat: .asciz "%d"
 rectangleArea: .asciz "The area of a rectangle with length %d and height %d is %d\n"
 
 .balign 4 
-rectLPrompt:  .asciz   "Enter recentagle length: \n"
+rectLPrompt:  .asciz   "Enter rectangle length: \n"
 .balign 4 
-rectHPrompt: .asciz   "Enter recentagle height: \n"
+rectHPrompt: .asciz   "Enter rectangle height: \n"
 
 .balign 4 
 exit_str:       .asciz      "Terminating program.\n"
@@ -25,29 +25,27 @@ rectH: .word 0
 main:
 
 rectangle_sr:
-    @ allot stack space for params
-     sub sp, sp, #8 
+
     @ branch to get_params subroutine
     bl rectangle_sr_params
     @ load params into register 4 - 6
     ldr r5, [sp], #4 @ height into r5
-    ldr r4, [sp], #4 @ length into r4
-    @ allot stack space for return value of area call
-    @sub sp, sp, #4 
-    @ put parameters into parameter registers
-    @ branch to get_area
-    @bl rectangle_sr_area
-    @ get return from stack
-    @ldr r4, [sp]
-    @ put saved parameters into read positions for print
-    @  mov r4, #4
-    @  mov r5, #5
-    @ mov r4, #20
+    ldr r4, [sp] @ length into r4
 
-    mov r1, r4 @ length into r1
-    mov r2, r5 @ height into r2
-    @ put return value from area calc in last position
-    mov r3, #30
+    @ put parameters into parameter registers
+    mov r0, r4 @ length into r0
+    mov r1, r5 @ height into r1
+
+    @ branch to get_area
+    bl rectangle_sr_area
+
+    @ get return from stack
+    ldr r4, [sp]
+    @ put saved parameters into read positions for print
+    mov r1, r7 @ length into r1
+    mov r2, r8 @ height into r2
+    @ put return  in last position
+    mov r3, r4
     ldr r0, =rectangleArea
     bl printf
     b _exit
@@ -87,6 +85,15 @@ rectangle_sr_params:
 
     pop {pc}
 
+rectangle_sr_area:
+    @ length -> height -> lr
+    push {r4, r5, lr}
+    mul r2, r0, r1
+    add sp, sp, #12
+    str r2, [sp]
+    sub sp, sp, #12
+    @ length <- height <- pc
+    pop {r7, r8, pc}
 
 _exit:  
     MOV R7, #4              @ write syscall, 4
