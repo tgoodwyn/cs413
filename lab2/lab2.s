@@ -25,15 +25,17 @@
 .balign 4
  triangle: .asciz "triangle"
 .balign 4
+exit_choice: .asciz "exit"
+.balign 4
  squareArea: .asciz "The area of a square of length %d is %d\n"
 .balign 4
  rectangleArea: .asciz "The area of a rectangle with length %d and height %d is %d\n"
 .balign 4
- trapezoidArea: .asciz "The area of the trapezoid is %d\n"
+ trapezoidArea: .asciz "The area of a trapezoid with combined lengths %d and height %d is %d\n"
 .balign 4
- triangleArea: .asciz "The area of the triangle is %d\n"
+ triangleArea: .asciz "The area of a triangle with length %d and height %d is %d\n"
  .balign 4
-invalidPrint: .asciz "Invalid choice. Type square, rectangle, triangle, or trapezoid . Or exit r\n"
+invalidPrint: .asciz "Invalid choice. Type square, rectangle, triangle, or trapezoid . Or exit \n"
  .balign 4
 againPrint: .asciz "Choose another. Or exit r\n"
 
@@ -143,6 +145,12 @@ branch_selection:
     cmp r0, r3
     beq triangle_sr
 
+    @ exit
+    ldr r2, =exit_choice 
+    ldr r3, [r2] 
+    cmp r0, r3
+    beq _exit
+
     @ invalid choice, return user to selection prompt  
     b invalid_print
 
@@ -175,7 +183,7 @@ square_sr:
     mov r2, r4
     ldr r0, =squareArea
     bl printf
-    b _exit
+    b welcome_print
 rectangle_sr:
 
     @ branch to get_params subroutine
@@ -200,36 +208,60 @@ rectangle_sr:
     mov r3, r4
     ldr r0, =rectangleArea
     bl printf
-    b _exit
+    b welcome_print
 
 trapezoid_sr:
-    @ allot stack space for params
     @ branch to get_params subroutine
     bl trapezoid_sr_params
-    @ load params into register and save
-    @ allot stack space for return value of area call
-    sub sp, sp, #4 
+    @ load params into register 4 - 6
+    ldr r6, [sp], #4
+    ldr r5, [sp], #4 @ height into r5
+    ldr r4, [sp] @ length into r4
+
     @ put parameters into parameter registers
+    mov r0, r4 @ length A into r0
+    mov r1, r5 @ length B into r1
+    mov r2, r6 @ height into r1
+
     @ branch to get_area
     bl trapezoid_sr_area
+
     @ get return from stack
-    ldr r7, [sp]
-    push {r7}
-    bl trapezoid_sr_print
+    ldr r4, [sp]
+
+    @ put saved parameters into read positions for print
+    add r1, r7, r8
+    mov r2, r9 @ height into r2
+    @ put return  in last position
+    mov r3, r4
+    ldr r0, =trapezoidArea
+    bl printf
+    b welcome_print
+
 triangle_sr:
-    @ allot stack space for params
     @ branch to get_params subroutine
     bl triangle_sr_params
-    @ load params into register and save
-    @ allot stack space for return value of area call
-    sub sp, sp, #4 
+    @ load params into register 4 - 6
+    ldr r5, [sp], #4 @ height into r5
+    ldr r4, [sp] @ length into r4
+
     @ put parameters into parameter registers
+    mov r0, r4 @ length into r0
+    mov r1, r5 @ height into r1
+
     @ branch to get_area
     bl triangle_sr_area
+
     @ get return from stack
-    ldr r7, [sp]
-    push {r7}
-    bl triangle_sr_print
+    ldr r4, [sp]
+    @ put saved parameters into read positions for print
+    mov r1, r7 @ length into r1
+    mov r2, r8 @ height into r2
+    @ put return  in last position
+    mov r3, r4
+    ldr r0, =triangleArea
+    bl printf
+    b welcome_print
 
 
 @-----------------------------------------------------------------------------------------
@@ -255,12 +287,8 @@ square_sr_params:
     str r0, [sp]
     sub sp, sp, #4
     pop {pc}
-
-
-
     
 rectangle_sr_params:
-
 
     push {lr}  
 
@@ -293,12 +321,82 @@ rectangle_sr_params:
 
     pop {pc}
 
-trapezoid_sr_params:
-    beq trapezoid_sr_area
-
-
 triangle_sr_params:
-    beq triangle_sr_area
+    push {lr}  
+
+    @@@ prompt for param 1  
+    ldr r0, =triLPrompt
+    bl  printf
+    ldr r0, =intInputFormat
+    ldr r1, =triL           
+    bl  scanf
+    ldr r0, =triL
+    @ store param 1 in r4    
+    ldr r4, [r0]
+
+    @@@ prompt for param 2 
+    ldr r0, =triHPrompt
+    bl  printf
+    ldr r0, =intInputFormat
+    ldr r1, =triH           
+    bl  scanf
+    ldr r0, =triH
+    @ store param 2 in r5    
+    ldr r5, [r0]
+
+    @ return sp to fp
+    add sp, sp, #8
+    @ store param 1 in fp -4
+    str r4, [sp], #-4
+    @ store param 2 in fp -8
+    str r5, [sp], #-4
+
+    pop {pc}
+
+
+trapezoid_sr_params:
+    push {lr}  
+
+    @@@ prompt for param 1  
+    ldr r0, =trapAPrompt
+    bl  printf
+    ldr r0, =intInputFormat
+    ldr r1, =trapA           
+    bl  scanf
+    ldr r0, =trapA
+    @ store param 1 in r4    
+    ldr r4, [r0]
+
+    @@@ prompt for param 2 
+    ldr r0, =trapBPrompt
+    bl  printf
+    ldr r0, =intInputFormat
+    ldr r1, =trapB           
+    bl  scanf
+    ldr r0, =trapB
+    @ store param 2 in r5    
+    ldr r5, [r0]
+
+    @@@ prompt for param 3 
+    ldr r0, =trapHPrompt
+    bl  printf
+    ldr r0, =intInputFormat
+    ldr r1, =trapH           
+    bl  scanf
+    ldr r0, =trapH
+    @ store param 3 in r6    
+    ldr r6, [r0]
+
+    @ return sp to fp
+    add sp, sp, #12
+    @ store param 1 in fp -4
+    str r4, [sp], #-4
+    @ store param 2 in fp -8
+    str r5, [sp], #-4
+    @ store param 3 in fp -8
+    str r6, [sp], #-4
+
+    pop {pc}
 
 
 @-----------------------------------------------------------------------------------------
@@ -334,21 +432,28 @@ rectangle_sr_area:
 
 
 trapezoid_sr_area:
-    push {lr}
-    mul r1, r0, r0
-    add sp, sp, #4
-    str r1, [sp]
-    sub sp, sp, #4
-    pop {pc}
+    @ length A \-, length B \- height \- lr -\ (tos)
+    push { r4,      r5,     r6,     lr }
+    add r1, r0, r1
+    mul r3, r2, r1
+    mov r3, r3, ASR #1
+    add sp, sp, #16
+    str r3, [sp]
+    sub sp, sp, #16
+    @ (tos) /- length A /- length B /- height /- lr
+    pop { r7,      r8,     r9,     pc }
 
 
 triangle_sr_area:
-    push {lr}
-    mul r1, r0, r0
-    add sp, sp, #4
-    str r1, [sp]
-    sub sp, sp, #4
-    pop {pc}
+    @      length \- height \- lr -\ (tos)
+    push { r4,       r5,       lr }
+    mul r2, r0, r1
+    mov r2, r2, ASR #1
+    add sp, sp, #12
+    str r2, [sp]
+    sub sp, sp, #12
+    @ (tos) /- length /- height /- lr
+    pop      { r7,       r8,       pc }
 
 
 @-----------------------------------------------------------------------------------------
@@ -358,24 +463,6 @@ triangle_sr_area:
 @
 @-----------------------------------------------------------------------------------------
 
-square_sr_print   :
-    mov r1, #4
-    ldr r0, =squareArea
-    bl  printf 
-
-rectangle_sr_print:
-    mov r1, #4
-    ldr r0, =rectangleArea
-    bl  printf 
-trapezoid_sr_print:
-    mov r1, #4
-    ldr r0, =trapezoidArea
-    bl  printf 
-triangle_sr_print  :
-    mov r1, #4
-    ldr r0, =triangleArea
-    bl  printf 
-print_area:
 
 
 _exit:  
