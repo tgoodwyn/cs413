@@ -4,11 +4,11 @@
 strInputFormat: .asciz "%s"
 .balign 4
 intInputFormat: .asciz "%d"
-
 .balign 4
 rectangleArea_mini: .asciz "The area of a rectangle is %d\n"
 .balign 4
-rectangleArea_proper: .asciz "The area of a rectangle with length %d and height %d is %d\n"
+rectangleArea: .asciz "The area of a rectangle with length %d and height %d is %d\n"
+
 .balign 4 
 rectLPrompt:  .asciz   "Enter recentagle length: \n"
 .balign 4 
@@ -16,9 +16,8 @@ rectHPrompt: .asciz   "Enter recentagle height: \n"
 
 .balign 4 
 exit_str:       .asciz      "Terminating program.\n"
-.balign 4
+
 rectL:  .word 0
-.balign 4
 rectH: .word 0
 
 .text
@@ -26,24 +25,32 @@ rectH: .word 0
 main:
 
 rectangle_sr:
-    sub sp, sp, #4
+    @ allot stack space for params
+     sub sp, sp, #8 
+    @ branch to get_params subroutine
     bl rectangle_sr_params
+    @ load params into register 4 - 6
+    ldr r5, [sp], #4 @ height into r5
+    ldr r4, [sp], #4 @ length into r4
+
+
+    mov r1, r4 @ length into r1
+    mov r2, r5 @ height into r2
+    mov r3, #30
     ldr r0, =rectangleArea_mini
     bl printf
     b _exit
 
 rectangle_sr_params:
     
-    push {lr}  
-    add sp, sp, #4
-    @ ldr r0, =rectLPrompt
-    @ bl  printf
-    @ ldr r0, =intInputFormat
-    @ ldr r1, =rectL           
-    @ bl  scanf
+     push {lr}  
+    add sp, sp, #8
+
     mov r1, #10
+    str r1, [sp], #-4
 
-
+    mov r2, #3
+    str r2, [sp], #-4
     pop {pc}
 
 
