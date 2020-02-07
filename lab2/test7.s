@@ -1,9 +1,8 @@
 /******************************************************************************
 *
-* checkpoint: yes error (test4)
+* * the file where we see what we can add and remain errorless (test5 is checkpoint)
 *
 ******************************************************************************/
-
 .data
 
 .balign 4
@@ -27,8 +26,6 @@ exit_str:       .asciz      "Terminating program.\n"
 .balign 4
 sqL:  .word 0
 
-
-
 .global main
 main:
 b welcome_print
@@ -41,13 +38,7 @@ get_input:
     ldr r0, =strInputFormat 
     ldr r1, =selection                              
     bl  scanf 
-      
-    @ load input into r0
-    ldr r2, =selection     
-    ldr r0, [r2]  
-
-
-
+ 
 rectangle_sr:
 
     @ branch to get_params subroutine
@@ -59,7 +50,7 @@ rectangle_sr:
     ldr r0, =rectangleArea
     bl printf
     b _exit
-  
+
 rectangle_sr_params:
     push {lr}    
     ldr r0, =squareLPrompt
@@ -73,7 +64,6 @@ rectangle_sr_params:
     str r0, [sp]
     sub sp, sp, #4
     pop {pc}
-
 
 _exit:  
     MOV R7, #4              @ write syscall, 4

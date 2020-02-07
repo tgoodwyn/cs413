@@ -1,27 +1,22 @@
 /******************************************************************************
 *
-* checkpoint: yes error (test4)
+* the file where we see what we can take away and still produce error (test4 is checkpoint)
 *
 ******************************************************************************/
-
 .data
 
 .balign 4
  welcomePrint: .asciz "Welcome. Please select a shape.\n"
 .balign 4
- selection: .word 0
+ selection: .space 128
 .balign 4
  strInputFormat: .asciz "%s"
  .balign 4
  intInputFormat: .asciz "%d"
 .balign 4
- rectangleArea: .asciz "The area of a rectangle with length %d and height %d is %d\n"
-.balign 4
- rectangle: .asciz "rectangle"
-
+ rectangleArea: .asciz "The area of a rectangle with length %d\n"
 .balign 4 
 squareLPrompt:  .asciz   "Enter square length: \n"
-
 .balign 4
 exit_str:       .asciz      "Terminating program.\n"
 .balign 4
@@ -41,10 +36,6 @@ get_input:
     ldr r0, =strInputFormat 
     ldr r1, =selection                              
     bl  scanf 
-      
-    @ load input into r0
-    ldr r2, =selection     
-    ldr r0, [r2]  
 
 
 
@@ -53,9 +44,6 @@ rectangle_sr:
     @ branch to get_params subroutine
     bl rectangle_sr_params
     mov r1, #2 @ length into r1
-    mov r2, #4 @ height into r2
-    @ put return  in last position
-    mov r3, #15
     ldr r0, =rectangleArea
     bl printf
     b _exit

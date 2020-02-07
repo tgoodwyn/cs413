@@ -9,7 +9,7 @@
 .balign 4
  welcomePrint: .asciz "Welcome. Please select a shape.\n"
 .balign 4
- selection: .word 0
+ selection: .space 128
 .balign 4
  strInputFormat: .asciz "%s"
  .balign 4
@@ -257,10 +257,11 @@ square_sr_params:
     pop {pc}
 
 
-rectangle_sr_params:
+
     
 rectangle_sr_params:
-    
+
+
     push {lr}  
 
     @@@ prompt for param 1  

@@ -1,23 +1,18 @@
 /******************************************************************************
 *
-* checkpoint: yes error (test4)
+* checkpoint - no error
 *
 ******************************************************************************/
-
 .data
 
 .balign 4
  welcomePrint: .asciz "Welcome. Please select a shape.\n"
-.balign 4
- selection: .word 0
-.balign 4
- strInputFormat: .asciz "%s"
+
  .balign 4
  intInputFormat: .asciz "%d"
 .balign 4
  rectangleArea: .asciz "The area of a rectangle with length %d and height %d is %d\n"
-.balign 4
- rectangle: .asciz "rectangle"
+
 
 .balign 4 
 squareLPrompt:  .asciz   "Enter square length: \n"
@@ -37,17 +32,8 @@ welcome_print:
     ldr r0, =welcomePrint
     bl  printf
 
-get_input:
-    ldr r0, =strInputFormat 
-    ldr r1, =selection                              
-    bl  scanf 
-      
-    @ load input into r0
-    ldr r2, =selection     
-    ldr r0, [r2]  
 
-
-
+ 
 rectangle_sr:
 
     @ branch to get_params subroutine
@@ -59,7 +45,7 @@ rectangle_sr:
     ldr r0, =rectangleArea
     bl printf
     b _exit
-  
+
 rectangle_sr_params:
     push {lr}    
     ldr r0, =squareLPrompt
@@ -73,7 +59,6 @@ rectangle_sr_params:
     str r0, [sp]
     sub sp, sp, #4
     pop {pc}
-
 
 _exit:  
     MOV R7, #4              @ write syscall, 4
