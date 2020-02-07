@@ -1,51 +1,68 @@
-
-
 .data
+
 .balign 4
- areaPrint: .asciz "The area is: %d \n"
+ strInputFormat: .asciz "%s"
+ .balign 4
+ intInputFormat: .asciz "%d"
+
+.balign 4
+ rectangleArea: .asciz "The area of a rectangle with length %d and height %d is %d\n"
+.balign 4
+
+
 .balign 4 
-squareLPrompt:  .asciz   "Enter square length: \n"
-.balign 4
-intInputFormat: .asciz "%d"
-.balign 4
+rectLPrompt:  .asciz   "Enter recentagle length: \n"
+.balign 4 
+rectHPrompt: .asciz   "Enter recentagle height: \n"
+
 exit_str:       .asciz      "Terminating program.\n"
-sqL:  .word 0
+rectL:  .word 0
+rectH: .word 0
 
-
-.global main
 .text
+.global main
 main:
-square_sr:
-    sub sp, sp, #4 
-    bl square_sr_params
-    add sp, sp, #4
-    ldr r1, [sp]
-    @mov r1, #4
-    ldr r0, =areaPrint
-    @bl  printf
-    @ bl square_sr_area
+
+rectangle_sr:
+    sub sp, sp, #8 
+    bl rectangle_sr_params
+    ldr r4, [sp], #4 @ hight into r4
+    ldr r5, [sp] @length into r5
+    mov r0, r4
+    mov r1, r5
+
+    bl rectangle_sr_area
+    ldr r4, [sp]
+    mov r1, r7
+    mov r2, r8
+    mov r3, r4
+    ldr r0, =rectangleArea
+    @bl printf
     b _exit
-    @ bl square_sr_print
 
-square_sr_params:
-
-    push {lr}
+rectangle_sr_params:
     
-    ldr r0, =squareLPrompt
-    @bl  printf
-
-    @ standard 5 instructions for scanf
-    ldr r0, =intInputFormat
-    ldr r1, =sqL                              
-    @bl  scanf 
-    ldr r2, =sqL     
-    @ldr r1, [r2]  
-    mov r1, #6
-    
-    add sp, sp, #4
-    str r1, [sp]
-    sub sp, sp, #4
+    push {lr}  
+    @ return sp to fp
+    add sp, sp, #8
+    @@@ prompt for param 1  
+    mov r1, #5
+    @ store this in fp -4
+    str r1, [sp], #-4
+    @@@ prompt for param 2
+    mov r2, #6
+    @ store this in fp -8
+    str r2, [sp], #-4
     pop {pc}
+
+rectangle_sr_area:
+    push {r4, r5, lr}
+    mul r2, r0, r1
+    add sp, sp, #12
+    str r2, [sp]
+    sub sp, sp, #12
+    pop {r7, r8, pc}
+
 _exit:  
     MOV R7, #4              @ write syscall, 4
     MOV R0, #1              @ output stream to monitor, 1
@@ -54,4 +71,3 @@ _exit:
     SWI 0                   @ execute syscall
     MOV R7, #1              @ terminate syscall, 1
     SWI 0                   @ execute syscall
-
