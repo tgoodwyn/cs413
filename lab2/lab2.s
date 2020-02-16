@@ -1,5 +1,5 @@
 /******************************************************************************
-* Lab 1
+* Lab 2
 * CS 413
 * Menon - 01
 * Tyler Goodwyn
@@ -77,7 +77,6 @@ trapH:  .word 0
 .global main
 main:
 b welcome_print
-@ b go_again
 
 welcome_print:
     ldr r0, =welcomePrint
@@ -87,15 +86,12 @@ invalid_print:
     ldr r0, =invalidPrint
     bl  printf
     b get_input 
-go_again:
-    ldr r0, =againPrint
-    bl  printf
-    b get_input 
+
+
 @-----------------------------------------------------------------------------------------
-@ TODO
-@ if you have two different input prompts
-@ (welcome and go again)
-@ you need to explicitly branch to get_input from each
+@ 
+@ get user selection
+@ 
 @
 @-----------------------------------------------------------------------------------------
 
