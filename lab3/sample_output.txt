@@ -1,0 +1,7 @@
+"Insert payment. Use only (d)imes, (q)uarters, and one-dollar (b)ills\n"
+"Insert %d cents in payment.\n"
+"Enough entered\n"
+"You selected Cheese Crackers. Is this correct (Y/N)?\n "
+"You selected gum. Is this correct (Y/N)?\n "
+"You selected m & m's. Is this correct (Y/N)?\n "
+"You selected peanuts. Is this correct (Y/N)?\n "
