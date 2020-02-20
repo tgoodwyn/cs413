@@ -131,6 +131,8 @@ cmp r0, #"n"
 beq welcome
 b invalid_input
 
+@ should only appear in master branch
+
 confirm_peanut:
 push {lr}
 ldr r0, =
