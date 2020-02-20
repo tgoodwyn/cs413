@@ -131,40 +131,7 @@ cmp r0, #"n"
 beq welcome
 b invalid_input
 
-@ should only appear in master branch
 
-confirm_peanut:
-push {lr}
-ldr r0, =
-bl ynPrompt
-cmp r0, #"y"
-pop {r2}
-mov lr, r2
-moveq pc, lr
-cmp r0, #"n"
-beq welcome
-b invalid_input
-
-confirm_gum:
-push {lr}
-ldr r0, =
-bl ynPrompt
-cmp r0, #"y"
-pop {r2}
-mov lr, r2
-moveq pc, lr
-cmp r0, #"n"
-beq welcome
-b invalid_input
-
-ynPrompt:
-push {lr}
-ldr r0, =charInputFmt
-ldr r1, =scannedStmt
-bl  scanf
-ldr r1, =scannedStmt
-ldr r0, [r1]
-pop {pc}
 
 invalid_input:
 ldr r0, =generic_error_message
