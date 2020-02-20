@@ -1,7 +1,72 @@
+
+@ 4 candies for copy/pasting
+mandm
+crack
+peanut
+gum
+
 "Insert payment. Use only (d)imes, (q)uarters, and one-dollar (b)ills\n"
 "Insert %d cents in payment.\n"
 "Enough entered\n"
-"You selected Cheese Crackers. Is this correct (Y/N)?\n "
-"You selected gum. Is this correct (Y/N)?\n "
-"You selected m & m's. Is this correct (Y/N)?\n "
-"You selected peanuts. Is this correct (Y/N)?\n "
+selMandm: .asciz "You selected m & m's. Is this correct (Y/N)?\n "
+selCrack: .asciz "You selected cheese crackers. Is this correct (Y/N)?\n "
+selPeanut: .asciz "You selected peanuts. Is this correct (Y/N)?\n "
+selGum: .asciz "You selected gum. Is this correct (Y/N)?\n "
+
+"Dispensing m & m's\n"
+"Dispensing peanuts\n"
+"Dispensing cheese crackers\n"
+"Dispensing gum\n"
+"Your change is %d cents"
+program asks user to select a char
+
+character comparison (could be a new template) and branch to respective program
+
+what gets passed from comparison to prompt_payment func?
+just
+ldr r1, =gumCost
+ldr r0, [r1]
+needs to be a subroutine call, and return to this loc (mov pc, lr)
+so that then the dispense statement can get called
+mov r1, r0 @ put the change into r1 for print param
+ldr r0, =giveChgStmt
+bl printf
+
+
+b prompt_payment
+
+get_input
+compare_input
+
+ch_mandm
+ldr r0, =selMandm
+ch_peanut
+ldr r0, =selPeanut
+ch_crack
+ldr r0, =selCrack  
+ch_gum
+ldr r0, =selGum
+
+prompt_payment
+push {lr}
+mov r4, r0 @ r4 holds cost of good
+cmp r3, r4 @ r3 is accumulator
+bge dispense
+mov r1, a
+mov r4, r2
+ldr r0,=payPrmStmt - "You have inserted %d cents. Please insert a total of %d"
+bl printf
+
+accumulate:
+scanf statement to get user insertion
+ldr r1, =userInsAmt
+ldr r1, [r0]
+b prompt_payment
+
+
+
+
+dispense
+sub r0, r4, r0
+pop {pc}
+@mov pc, lr @ needs to go back to ch function w/ r0 as param for second print there

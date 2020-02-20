@@ -8,8 +8,9 @@
 
 /**************************** data **************************************************/
 .data
+
 .balign 4
-welcomeMsg: .asciz "Hello and welcome to Tyler Goodwyn's vending machine. Please select what snack you would like...\n"
+welcomeMsg: .asciz "Hello .\n"
 .balign 4
 scannedStmt: .word 0
 
@@ -34,35 +35,6 @@ gumInvPrint:.asciz "Gum inventory is %d\n"
 main:
 
 welcome:
-
-@prompt
-ldr r0, =gumInventory
-ldr r1, [r0]
-ldr r0, =gumInvPrint 
-bl  printf     
-
-@ scan and load into r0
-ldr r0, =intInputFmt
-ldr r1, =scannedStmt
-bl  scanf
-ldr r0, =scannedStmt
-ldr r1, [r0]
-
-@added
-ldr r0, =gumInventory
-str r1, [r0]
-
-ldr r1, [r0]
-@print out input
-ldr r0, =gumInvPrint 
-bl  printf
-
-
-/******************************************************************************
-* 
-* gum inventory part
-* (working @ 11:32pm)
-******************************************************************************/
 
 @prompt
 ldr r0, =gumInventory

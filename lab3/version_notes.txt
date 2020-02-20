@@ -1,0 +1,8 @@
+1st version:
+
+lets do one where user inputs an amount of cents (no comparison logic on coinage entered yet)
+no confirmation after candy type either (but can leave the full prompt in)
+
+version 2 - wed night
+
+adding the 4 branches after cmparison of character input
